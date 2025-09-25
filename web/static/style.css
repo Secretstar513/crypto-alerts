@@ -1,0 +1,98 @@
+:root {
+  --bg: #0b0f14;
+  --card: #111827;
+  --fg: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #60a5fa;
+  --danger: #ef4444;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: system-ui, Segoe UI, Roboto, Arial;
+  background: var(--bg);
+  color: var(--fg);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #1f2937;
+}
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+nav a {
+  color: var(--muted);
+  margin-left: 16px;
+  text-decoration: none;
+}
+nav a.active,
+nav a:hover {
+  color: var(--fg);
+}
+main {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+.card {
+  background: var(--card);
+  padding: 16px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #1f2937;
+}
+h2 {
+  margin-top: 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+input,
+select,
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background: #0b1220;
+  color: var(--fg);
+}
+button {
+  background: #111827;
+  border: 1px solid #374151;
+  cursor: pointer;
+}
+button:hover {
+  border-color: var(--accent);
+}
+button.danger {
+  border-color: var(--danger);
+  color: #fecaca;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 8px;
+  border-bottom: 1px solid #1f2937;
+  text-align: left;
+}
+.actions form {
+  display: inline-block;
+}
+footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+  color: var(--muted);
+}

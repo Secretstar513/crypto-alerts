@@ -1,0 +1,33 @@
+{{ define "channels" }}
+{{ template "base" . }}
+{{ end }}
+
+{{ define "content" }}
+<section class="card">
+  <h2>Email Channel</h2>
+  <form method="post" action="/channels/email">
+    <div class="grid">
+      <label>Enabled <input type="checkbox" name="enabled" checked /></label>
+      <label>Host <input name="host" placeholder="localhost"/></label>
+      <label>Port <input name="port" placeholder="1025"/></label>
+      <label>User <input name="user" placeholder=""/></label>
+      <label>Pass <input name="pass" type="password" placeholder=""/></label>
+      <label>From <input name="from" placeholder="alerts@example.com"/></label>
+      <label>To <input name="to" placeholder="you@example.com"/></label>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Telegram Channel</h2>
+  <form method="post" action="/channels/telegram">
+    <div class="grid">
+      <label>Enabled <input type="checkbox" name="enabled" checked /></label>
+      <label>Bot Token <input name="botToken" placeholder="1234:ABC"/></label>
+      <label>Chat ID <input name="chatID" placeholder="123456789"/></label>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+</section>
+{{ end }}

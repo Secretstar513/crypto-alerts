@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Crypto Alerts</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+</head>
+<body>
+<header>
+  <h1>Crypto Alerts</h1>
+  <nav>
+    <a href="/" {{if eq .Page "alerts"}}class="active"{{end}}>Alerts</a>
+    <a href="/channels" {{if eq .Page "channels"}}class="active"{{end}}>Channels</a>
+  </nav>
+</header>
+<main>
+  {{ block "content" . }}{{ end }}
+</main>
+<footer>
+  <small>Binance prices via WS/HTTP. Demo app.</small>
+</footer>
+</body>
+</html>

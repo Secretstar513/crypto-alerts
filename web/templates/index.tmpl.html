@@ -1,0 +1,30 @@
+{{ define "index" }}
+{{ template "base" . }}
+{{ end }}
+
+{{ define "content" }}
+<section class="card">
+  <h2>Create Alert</h2>
+  <form hx-post="/alerts" hx-target="#alerts-list" hx-swap="outerHTML">
+    <div class="grid">
+      <label>Symbol
+        <input name="symbol" placeholder="BTCUSDT" required />
+      </label>
+      <label>Threshold
+        <input type="number" step="0.00000001" name="threshold" placeholder="65000" required />
+      </label>
+      <label>Direction
+        <select name="direction">
+          <option value="UP">UP (crossing upward)</option>
+          <option value="DOWN">DOWN (crossing downward)</option>
+        </select>
+      </label>
+    </div>
+    <button type="submit">Add Alert</button>
+  </form>
+</section>
+
+<section class="card" id="alerts-list">
+  {{ template "alerts" . }}
+</section>
+{{ end }}
