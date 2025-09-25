@@ -9,7 +9,6 @@ func ValidateAlert(a *Alert) error {
 	if a.Symbol == "" {
 		return errors.New("symbol required")
 	}
-	// Binance spot symbols are uppercase like BTCUSDT
 	if strings.ToUpper(a.Symbol) != a.Symbol {
 		return errors.New("symbol must be uppercase, e.g., BTCUSDT")
 	}

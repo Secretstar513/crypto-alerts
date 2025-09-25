@@ -26,6 +26,6 @@ func (n *TelegramNotifier) Notify(ctx context.Context, ev Event) error {
 	text := url.QueryEscape(fmt.Sprintf("ALERT %s %s @ %.8f (thr %.8f)", ev.Symbol, ev.Direction, ev.Price, ev.Threshold))
 	api := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s", n.botToken, n.chatID, text)
 	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, api, nil)
-	_, _ = http.DefaultClient.Do(req) // ignore errors to keep flow simple
+	_, _ = http.DefaultClient.Do(req)
 	return nil
 }

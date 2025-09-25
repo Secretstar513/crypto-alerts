@@ -214,26 +214,6 @@ Environment (via `.env` or real env vars):
 
 ---
 
-## 🔍 Troubleshooting
-
-- **“Access to storage is not allowed from this context.”**  
-  Harmless; usually a browser extension or privacy setting trying to touch `localStorage`. Use an incognito window or disable extensions on `localhost`.
-
-- **Nothing happens after creating an alert**  
-  Ensure the Symbol is **uppercase** and near the actual price (±20 for BTC).  
-  The engine needs one baseline tick per symbol; give it a moment (HTTP fallback polls every 10s).
-
-- **CGO error with sqlite**  
-  This project uses **glebarez/sqlite** (pure Go). If you see CGO messages, ensure your `internal/db/db.go` imports `github.com/glebarez/sqlite` (not `gorm.io/driver/sqlite`).
-
-- **No emails**  
-  Use MailHog first. Real SMTP servers may require TLS/auth — set `SMTP_USER/PASS` and a proper host/port.
-
-- **Telegram 403**  
-  You must **start** a DM with your bot once. For groups, ensure the bot is added and use the group’s negative chat id.
-
----
-
 ## 📡 API (Internal)
 
 - `POST /alerts` → create (HTMX partial response)
@@ -260,15 +240,3 @@ Environment (via `.env` or real env vars):
 
 MIT (or your choice). See `LICENSE` if provided.
 
----
-
-## 🙌 Credits / Inspiration
-
-- Binance Ticker API  
-- HTMX (`htmx.org`)  
-- glebarez/sqlite (pure Go SQLite driver)
-
----
-
-### Happy hacking!  
-If you want a **“Send Test Notification”** button on Channels, a **cooldown** for jitter near thresholds, or additional channels (Slack/Webhook/Broker), the codebase is ready—open an issue or extend `internal/notif/`.

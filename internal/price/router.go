@@ -12,7 +12,6 @@ type Update struct {
 
 type Subscriber chan Update
 
-// Router manages symbol streams and fan-out updates to subscribers.
 type Router struct {
 	mu       sync.Mutex
 	streams  map[string]*symbolStream
@@ -29,7 +28,7 @@ func (r *Router) Subscribe(ctx context.Context, symbol string) Subscriber {
 	if !ok {
 		s = newSymbolStream(symbol)
 		r.streams[symbol] = s
-		go s.run(ctx) // start stream
+		go s.run(ctx)
 	}
 	ch := make(Subscriber, 16)
 	s.add(ch)

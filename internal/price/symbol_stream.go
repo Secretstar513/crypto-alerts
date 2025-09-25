@@ -38,11 +38,9 @@ func (s *symbolStream) run(parent context.Context) {
 
 	out := make(chan float64, 8)
 
-	// supervisor: try WS, on error fallback to HTTP, then retry WS periodically
 	go func() {
 		for {
 			if err := streamBinance(ctx, s.symbol, out); err != nil {
-				// fallback to HTTP polling for a short while
 				_ = pollHTTP(ctx, s.symbol, out)
 				select {
 				case <-ctx.Done():

@@ -28,18 +28,17 @@ type App struct {
 
 func New(cfg *config.Config) *App {
 	d := db.OpenSQLite(cfg.DBPath)
-	// migrations
+
 	if err := d.AutoMigrate(&domain.Alert{}, &domain.Channel{}, &domain.LastPrice{}); err != nil {
 		panic(err)
 	}
 
-	// built-in channels: Log is always present (enabled true by default)
 	notifs := []notif.Notifier{
 		notif.NewLog(true),
 		notif.NewEmail(notif.EmailConfig{
 			Host: cfg.SMTPHost, Port: cfg.SMTPPort, User: cfg.SMTPUser, Pass: cfg.SMTPPass,
 			From: cfg.EmailFrom, To: cfg.EmailTo,
-		}, true), // enable; it will no-op if not configured
+		}, true),
 		notif.NewTelegram(cfg.TelegramBotToken, cfg.TelegramChatID, true),
 	}
 
@@ -64,18 +63,15 @@ func (a *App) Stop() {
 }
 
 func (a *App) runEngine(ctx context.Context) {
-	// Subscribe per symbol for all enabled alerts and evaluate crossings.
-	// Reconcile every 5s to catch new/changed alerts without restart.
 	tk := time.NewTicker(5 * time.Second)
 	defer tk.Stop()
 
 	type subInfo struct {
 		sub price.Subscriber
 	}
-	subs := map[string]subInfo{} // key: symbol
+	subs := map[string]subInfo{} 
 
 	for {
-		// reconcile
 		var alerts []domain.Alert
 		if err := a.DB.Where("enabled = ?", true).Find(&alerts).Error; err == nil {
 			need := map[string]struct{}{}
@@ -89,7 +85,6 @@ func (a *App) runEngine(ctx context.Context) {
 			}
 		}
 
-		// pump updates non-blockingly
 		for sym, si := range subs {
 			select {
 			case upd := <-si.sub:
@@ -119,7 +114,6 @@ func (a *App) handlePriceUpdate(ctx context.Context, symbol string, priceVal flo
 	lp.UpdatedAt = time.Now()
 	a.DB.Save(&lp)
 
-	// Check alerts for this symbol
 	var alerts []domain.Alert
 	if err := a.DB.Where("enabled = ? AND symbol = ?", true, symbol).Find(&alerts).Error; err != nil {
 		return

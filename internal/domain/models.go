@@ -11,9 +11,9 @@ const (
 
 type Alert struct {
 	ID        string    `gorm:"primaryKey"`
-	Symbol    string    // e.g., BTCUSDT
-	Threshold float64   // price boundary
-	Direction Direction // UP or DOWN
+	Symbol    string
+	Threshold float64
+	Direction Direction
 	Enabled   bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -29,9 +29,9 @@ const (
 
 type Channel struct {
 	ID        string      `gorm:"primaryKey"`
-	Kind      ChannelKind // LOG | EMAIL | TELEGRAM
+	Kind      ChannelKind
 	Enabled   bool
-	Config    string      // JSON blob per channel
+	Config    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

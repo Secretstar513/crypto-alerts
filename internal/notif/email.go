@@ -34,7 +34,7 @@ func (n *EmailNotifier) Enabled() bool { return n.enabled }
 func (n *EmailNotifier) Notify(ctx context.Context, ev Event) error {
 	if !n.enabled { return nil }
 	if n.cfg.Host == "" || n.cfg.Port == "" || n.cfg.From == "" || n.cfg.To == "" {
-		return nil // silently skip if not configured
+		return nil
 	}
 	sub := fmt.Sprintf("[Crypto Alert] %s %s %.2f (thr=%.2f)", ev.Symbol, ev.Direction, ev.Price, ev.Threshold)
 	body := fmt.Sprintf("Symbol: %s\nDirection: %s\nPrice: %.8f\nThreshold: %.8f\nTime: %s\n",
@@ -49,15 +49,12 @@ func (n *EmailNotifier) Notify(ctx context.Context, ev Event) error {
 	msg.WriteString("Content-Type: text/plain; charset=utf-8\r\n\r\n")
 	msg.WriteString(body)
 
-	// Try STARTTLS if creds provided, otherwise plain (for MailHog works without auth)
 	var auth smtp.Auth
 	if n.cfg.User != "" || n.cfg.Pass != "" {
 		auth = smtp.PlainAuth("", n.cfg.User, n.cfg.Pass, n.cfg.Host)
 	}
 
-	// best-effort TLS
 	_ = smtp.SendMail(addr, auth, n.cfg.From, []string{n.cfg.To}, []byte(msg.String()))
-	// Some servers require explicit TLS:
 	conn, err := tls.Dial("tcp", addr, &tls.Config{InsecureSkipVerify: true})
 	if err == nil {
 		_ = conn.Close()

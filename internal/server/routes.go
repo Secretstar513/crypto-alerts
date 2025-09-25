@@ -17,7 +17,6 @@ func Routes(h *Handlers) http.Handler {
 	r.Post("/channels/email", h.UpsertEmail)
 	r.Post("/channels/telegram", h.UpsertTelegram)
 
-	// static
 	fs := http.FileServer(http.Dir("web/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	return r

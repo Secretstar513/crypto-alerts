@@ -10,14 +10,12 @@ import (
 type Config struct {
 	Addr           string
 	DBPath         string
-	// Email
 	SMTPHost       string
 	SMTPPort       string
 	SMTPUser       string
 	SMTPPass       string
 	EmailFrom      string
 	EmailTo        string
-	// Telegram
 	TelegramBotToken string
 	TelegramChatID   string
 }

@@ -28,7 +28,6 @@
 <div id="toast"></div>
 
 <script>
-  // Fancy toasts: success / error / info with slide-in + auto-dismiss
   (function(){
     const hostId = 'toast';
     const host = document.getElementById(hostId);
@@ -56,7 +55,6 @@
       info:(m)=> makeToast('info', m),
     };
   
-    // Example hook already used on Alerts:
     document.addEventListener('alert-changed', ()=> toast.ok('Alerts updated'));
     document.addEventListener('channels-saved', ()=> toast.ok('Channel settings saved'));
   })();

@@ -9,7 +9,7 @@ import (
 )
 
 type binanceTicker struct {
-	C string `json:"c"` // last price as string
+	C string `json:"c"`
 }
 
 func wsURL(symbol string) string {

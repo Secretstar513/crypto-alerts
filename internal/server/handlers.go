@@ -28,7 +28,7 @@ func (h *Handlers) Index(w http.ResponseWriter, r *http.Request) {
     data := map[string]any{
         "Alerts":      list,
         "Page":        "alerts",
-        "ContentTmpl": "alerts_page", // <— tell base which partial to render
+        "ContentTmpl": "alerts_page",
     }
     if err := h.tpl.ExecuteTemplate(w, "base", data); err != nil {
         http.Error(w, err.Error(), 500)
@@ -49,7 +49,6 @@ func (h *Handlers) CreateAlert(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Info().Str("id", al.ID).Msg("alert created")
 
-	// return partial alerts list for htmx replace
 	list, _ := h.App.ListAlerts()
 	w.Header().Set("HX-Trigger", "alert-changed")
 	_ = h.tpl.ExecuteTemplate(w, "alerts", map[string]any{"Alerts": list})
@@ -79,7 +78,6 @@ func (h *Handlers) DeleteAlert(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) ChannelsPage(w http.ResponseWriter, r *http.Request) {
     chs, _ := h.App.ListChannels()
 
-    // Defaults
     emailEnabled := true
     emailCfg := notif.EmailConfig{}
     tgEnabled := true
@@ -88,7 +86,6 @@ func (h *Handlers) ChannelsPage(w http.ResponseWriter, r *http.Request) {
         ChatID   string `json:"chatID"`
     }{}
 
-    // Populate from DB rows if present
     for _, ch := range chs {
         switch ch.Kind {
         case domain.ChannelEmail:
