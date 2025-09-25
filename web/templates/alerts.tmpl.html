@@ -1,34 +1,67 @@
 {{ define "alerts" }}
-<h2>Alerts</h2>
-<table>
-  <thead>
-    <tr><th>Symbol</th><th>Threshold</th><th>Direction</th><th>Enabled</th><th>Actions</th></tr>
-  </thead>
-  <tbody>
-  {{ range .Alerts }}
-    <tr>
-      <td>{{ .Symbol }}</td>
-      <td>{{ printf "%.8f" .Threshold }}</td>
-      <td>{{ .Direction }}</td>
-      <td>{{ if .Enabled }}✅{{ else }}❌{{ end }}</td>
-      <td class="actions">
-        <form hx-post="/alerts/{{ .ID }}/toggle" hx-target="#alerts-list" hx-swap="outerHTML" style="display:inline">
-          {{ if .Enabled }}
-          <input type="hidden" name="enable" value="false"/>
-          <button>Disable</button>
+<section class="card" id="alerts-list">
+  <h2>Alerts</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Threshold</th>
+        <th>Direction</th>
+        <th>Status</th>
+        <th class="actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .Alerts }}
+      <tr>
+        <td><span class="badge">{{ .Symbol }}</span></td>
+        <td>{{ printf "%.8f" .Threshold }}</td>
+        <td>
+          {{ if eq .Direction "UP" }}
+          <span class="badge up">UP</span>
           {{ else }}
-          <input type="hidden" name="enable" value="true"/>
-          <button>Enable</button>
+          <span class="badge down">DOWN</span>
           {{ end }}
-        </form>
-        <form hx-post="/alerts/{{ .ID }}/delete" hx-target="#alerts-list" hx-swap="outerHTML" style="display:inline" onsubmit="return confirm('Delete alert?')">
-          <button class="danger">Delete</button>
-        </form>
-      </td>
-    </tr>
-  {{ else }}
-    <tr><td colspan="5"><em>No alerts yet. Create one above.</em></td></tr>
-  {{ end }}
-  </tbody>
-</table>
+        </td>
+        <td>
+          {{ if .Enabled }}<span
+            class="badge"
+            style="border-color: rgba(34, 197, 94, 0.6); color: #bbf7d0"
+            >Enabled</span
+          >{{ else }}<span class="badge">Disabled</span>{{ end }}
+        </td>
+        <td class="actions">
+          <form
+            hx-post="/alerts/{{ .ID }}/toggle"
+            hx-target="#alerts-list"
+            hx-swap="outerHTML"
+          >
+            {{ if .Enabled }}
+            <input type="hidden" name="enable" value="false" />
+            <button class="btn">Disable</button>
+            {{ else }}
+            <input type="hidden" name="enable" value="true" />
+            <button class="btn">Enable</button>
+            {{ end }}
+          </form>
+          <form
+            hx-post="/alerts/{{ .ID }}/delete"
+            hx-target="#alerts-list"
+            hx-swap="outerHTML"
+            hx-confirm="Delete this alert?"
+            hx-on:htmx:beforeRequest="this.querySelector('button').disabled = true"
+            hx-on:htmx:afterRequest="this.querySelector('button').disabled = false"
+          >
+            <button class="btn btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{ else }}
+      <tr>
+        <td colspan="5"><em>No alerts yet. Create one above.</em></td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</section>
 {{ end }}

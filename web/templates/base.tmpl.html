@@ -1,3 +1,4 @@
+{{ define "base" }}
 <!doctype html>
 <html>
 <head>
@@ -5,21 +6,62 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Crypto Alerts</title>
   <link rel="stylesheet" href="/static/style.css"/>
-  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <script src="/static/htmx.min.js"></script>
 </head>
 <body>
 <header>
-  <h1>Crypto Alerts</h1>
+  <div class="brand">Crypto Alerts</div>
   <nav>
     <a href="/" {{if eq .Page "alerts"}}class="active"{{end}}>Alerts</a>
     <a href="/channels" {{if eq .Page "channels"}}class="active"{{end}}>Channels</a>
   </nav>
 </header>
+
 <main>
-  {{ block "content" . }}{{ end }}
+  {{ if eq .Page "alerts" }}
+    {{ template "alerts_page" . }}
+  {{ else if eq .Page "channels" }}
+    {{ template "channels_page" . }}
+  {{ end }}
 </main>
-<footer>
-  <small>Binance prices via WS/HTTP. Demo app.</small>
-</footer>
+
+<div id="toast"></div>
+
+<script>
+  // Fancy toasts: success / error / info with slide-in + auto-dismiss
+  (function(){
+    const hostId = 'toast';
+    const host = document.getElementById(hostId);
+  
+    function makeToast(kind, msg, timeout=2600){
+      const el = document.createElement('div');
+      el.className = `toast toast-${kind}`;
+      el.innerHTML = `
+        <div class="toast-dot"></div>
+        <div class="toast-msg">${msg}</div>
+        <button class="toast-x" aria-label="Close">×</button>
+      `;
+      el.querySelector('.toast-x').onclick = () => el.remove();
+      host.appendChild(el);
+      requestAnimationFrame(()=> el.classList.add('in'));
+      setTimeout(()=> {
+        el.classList.remove('in');
+        setTimeout(()=> el.remove(), 180);
+      }, timeout);
+    }
+  
+    window.toast = {
+      ok: (m)=> makeToast('ok', m),
+      err: (m)=> makeToast('err', m),
+      info:(m)=> makeToast('info', m),
+    };
+  
+    // Example hook already used on Alerts:
+    document.addEventListener('alert-changed', ()=> toast.ok('Alerts updated'));
+    document.addEventListener('channels-saved', ()=> toast.ok('Channel settings saved'));
+  })();
+  </script>
 </body>
 </html>
+{{ end }}
+ 

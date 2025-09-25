@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -24,9 +24,16 @@ func NewHandlers(a *app.App) *Handlers {
 }
 
 func (h *Handlers) Index(w http.ResponseWriter, r *http.Request) {
-	list, _ := h.App.ListAlerts()
-	data := map[string]any{"Alerts": list, "Page": "alerts"}
-	_ = h.tpl.ExecuteTemplate(w, "index", data)
+    list, _ := h.App.ListAlerts()
+    data := map[string]any{
+        "Alerts":      list,
+        "Page":        "alerts",
+        "ContentTmpl": "alerts_page", // <— tell base which partial to render
+    }
+    if err := h.tpl.ExecuteTemplate(w, "base", data); err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
 }
 
 func (h *Handlers) CreateAlert(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +62,7 @@ func (h *Handlers) ToggleAlert(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400); return
 	}
 	list, _ := h.App.ListAlerts()
+	w.Header().Set("HX-Trigger", "alert-changed")
 	_ = h.tpl.ExecuteTemplate(w, "alerts", map[string]any{"Alerts": list})
 }
 
@@ -64,41 +72,77 @@ func (h *Handlers) DeleteAlert(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400); return
 	}
 	list, _ := h.App.ListAlerts()
+	w.Header().Set("HX-Trigger", "alert-changed")
 	_ = h.tpl.ExecuteTemplate(w, "alerts", map[string]any{"Alerts": list})
 }
 
 func (h *Handlers) ChannelsPage(w http.ResponseWriter, r *http.Request) {
-	ch, _ := h.App.ListChannels()
-	data := map[string]any{"Channels": ch, "Page": "channels"}
-	_ = h.tpl.ExecuteTemplate(w, "channels", data)
+    chs, _ := h.App.ListChannels()
+
+    // Defaults
+    emailEnabled := true
+    emailCfg := notif.EmailConfig{}
+    tgEnabled := true
+    tgCfg := struct {
+        BotToken string `json:"botToken"`
+        ChatID   string `json:"chatID"`
+    }{}
+
+    // Populate from DB rows if present
+    for _, ch := range chs {
+        switch ch.Kind {
+        case domain.ChannelEmail:
+            emailEnabled = ch.Enabled
+            _ = json.Unmarshal([]byte(ch.Config), &emailCfg)
+        case domain.ChannelTelegram:
+            tgEnabled = ch.Enabled
+            _ = json.Unmarshal([]byte(ch.Config), &tgCfg)
+        }
+    }
+
+    data := map[string]any{
+        "Page":          "channels",
+        "EmailEnabled":  emailEnabled,
+        "Email":         emailCfg,
+        "TGEnabled":     tgEnabled,
+        "Telegram":      tgCfg,
+        "Saved":         r.URL.Query().Get("saved") == "1",
+    }
+
+    if err := h.tpl.ExecuteTemplate(w, "base", data); err != nil {
+        http.Error(w, err.Error(), 500)
+        return
+    }
 }
 
 func (h *Handlers) UpsertEmail(w http.ResponseWriter, r *http.Request) {
-	_ = r.ParseForm()
-	cfg := notif.EmailConfig{
-		Host: r.FormValue("host"),
-		Port: r.FormValue("port"),
-		User: r.FormValue("user"),
-		Pass: r.FormValue("pass"),
-		From: r.FormValue("from"),
-		To:   r.FormValue("to"),
-	}
-	enabled := r.FormValue("enabled") == "on"
-	if err := h.App.UpsertChannel(domain.ChannelEmail, enabled, cfg); err != nil {
-		http.Error(w, err.Error(), 400); return
-	}
-	http.Redirect(w, r, "/channels", http.StatusSeeOther)
+    _ = r.ParseForm()
+    cfg := notif.EmailConfig{
+        Host: r.FormValue("host"),
+        Port: r.FormValue("port"),
+        User: r.FormValue("user"),
+        Pass: r.FormValue("pass"),
+        From: r.FormValue("from"),
+        To:   r.FormValue("to"),
+    }
+    enabled := r.FormValue("enabled") == "on"
+    if err := h.App.UpsertChannel(domain.ChannelEmail, enabled, cfg); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest); return
+    }
+    w.Header().Set("HX-Trigger", "channels-saved")
+    w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handlers) UpsertTelegram(w http.ResponseWriter, r *http.Request) {
-	_ = r.ParseForm()
-	cfg := map[string]string{
-		"botToken": r.FormValue("botToken"),
-		"chatID":   r.FormValue("chatID"),
-	}
-	enabled := r.FormValue("enabled") == "on"
-	if err := h.App.UpsertChannel(domain.ChannelTelegram, enabled, cfg); err != nil {
-		http.Error(w, err.Error(), 400); return
-	}
-	http.Redirect(w, r, "/channels", http.StatusSeeOther)
+    _ = r.ParseForm()
+    cfg := map[string]string{
+        "botToken": r.FormValue("botToken"),
+        "chatID":   r.FormValue("chatID"),
+    }
+    enabled := r.FormValue("enabled") == "on"
+    if err := h.App.UpsertChannel(domain.ChannelTelegram, enabled, cfg); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest); return
+    }
+    w.Header().Set("HX-Trigger", "channels-saved")
+    w.WriteHeader(http.StatusNoContent)
 }

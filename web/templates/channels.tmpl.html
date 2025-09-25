@@ -1,33 +1,157 @@
-{{ define "channels" }}
-{{ template "base" . }}
-{{ end }}
+{{ define "channels_page" }}
 
-{{ define "content" }}
+<!-- EMAIL CHANNEL -->
 <section class="card">
-  <h2>Email Channel</h2>
-  <form method="post" action="/channels/email">
-    <div class="grid">
-      <label>Enabled <input type="checkbox" name="enabled" checked /></label>
-      <label>Host <input name="host" placeholder="localhost"/></label>
-      <label>Port <input name="port" placeholder="1025"/></label>
-      <label>User <input name="user" placeholder=""/></label>
-      <label>Pass <input name="pass" type="password" placeholder=""/></label>
-      <label>From <input name="from" placeholder="alerts@example.com"/></label>
-      <label>To <input name="to" placeholder="you@example.com"/></label>
+  <h2 class="icon">
+    <span class="icon-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M4 6h16v12H4zM4 6l8 6 8-6"
+          stroke="#7dd3fc"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </span>
+    Email Channel
+  </h2>
+
+  <form
+    hx-post="/channels/email"
+    hx-swap="none"
+  >
+    <div class="row" style="margin-bottom: 10px">
+      <label class="switch"
+        ><input type="checkbox" name="enabled" checked /><span
+          >Enabled</span
+        ></label
+      >
+      <div class="spacer"></div>
+      <span class="htmx-indicator"><span class="spinner"></span></span>
     </div>
-    <button type="submit">Save</button>
+
+    <div class="grid cols-4">
+      <label
+        >Host
+        <input name="host" placeholder="localhost" value="{{ .Email.Host }}" />
+      </label>
+      <label
+        >Port
+        <input name="port" placeholder="1025" value="{{ .Email.Port }}" />
+      </label>
+      <label
+        >From
+        <input
+          name="from"
+          placeholder="alerts@example.com"
+          value="{{ .Email.From }}"
+        />
+      </label>
+      <label
+        >To
+        <input
+          name="to"
+          placeholder="you@example.com"
+          value="{{ .Email.To }}"
+        />
+      </label>
+      <label
+        >User
+        <input name="user" placeholder="" value="{{ .Email.User }}" />
+      </label>
+      <label
+        >Pass
+        <input
+          name="pass"
+          type="password"
+          placeholder=""
+          value="{{ .Email.Pass }}"
+        />
+      </label>
+    </div>
+
+    <div class="help">
+      Tip: for local testing, run MailHog (<code
+        >docker run -p 1025:1025 -p 8025:8025 mailhog/mailhog</code
+      >) and set Host=localhost, Port=1025.
+    </div>
+
+    <div style="text-align: right; margin-top: 12px">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <button
+        class="btn btn-ghost"
+        type="button"
+        onclick="document.forms[0].reset()"
+      >
+        Reset
+      </button>
+    </div>
   </form>
 </section>
 
+<!-- TELEGRAM CHANNEL -->
 <section class="card">
-  <h2>Telegram Channel</h2>
-  <form method="post" action="/channels/telegram">
-    <div class="grid">
-      <label>Enabled <input type="checkbox" name="enabled" checked /></label>
-      <label>Bot Token <input name="botToken" placeholder="1234:ABC"/></label>
-      <label>Chat ID <input name="chatID" placeholder="123456789"/></label>
+  <h2 class="icon">
+    <span class="icon-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M21 3L3 10l7 3 3 7 8-17z"
+          stroke="#7dd3fc"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </span>
+    Telegram Channel
+  </h2>
+
+  <form
+    hx-post="/channels/telegram"
+    hx-swap="none"
+  >
+    <div class="row" style="margin-bottom: 10px">
+      <label class="switch"
+        ><input type="checkbox" name="enabled" checked /><span
+          >Enabled</span
+        ></label
+      >
+      <div class="spacer"></div>
+      <span class="htmx-indicator"><span class="spinner"></span></span>
     </div>
-    <button type="submit">Save</button>
+
+    <div class="grid cols-3">
+      <label
+        >Bot Token
+        <input
+          name="botToken"
+          placeholder="1234:ABC"
+          value="{{ .Telegram.BotToken }}"
+        />
+      </label>
+      <label
+        >Chat ID
+        <input
+          name="chatID"
+          placeholder="123456789"
+          value="{{ .Telegram.ChatID }}"
+        />
+      </label>
+      <div></div>
+    </div>
+
+    <div style="text-align: right; margin-top: 12px">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <button
+        class="btn btn-ghost"
+        type="button"
+        onclick="document.forms[1].reset()"
+      >
+        Reset
+      </button>
+    </div>
   </form>
 </section>
+
 {{ end }}

@@ -147,7 +147,7 @@ func (a *App) fire(ctx context.Context, al domain.Alert, priceVal float64) {
 
 func (a *App) CreateAlert(symbol string, thr float64, dir domain.Direction) (domain.Alert, error) {
 	al := domain.Alert{
-		ID:        nuid.New(),
+		ID:        nuid.Next(),
 		Symbol:    symbol,
 		Threshold: thr,
 		Direction: dir,
@@ -178,7 +178,7 @@ func (a *App) UpsertChannel(kind domain.ChannelKind, enabled bool, cfg any) erro
 	res := a.DB.First(&ch, "kind = ?", kind)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		ch = domain.Channel{
-			ID: nuid.New(), Kind: kind, Enabled: enabled, Config: string(js),
+			ID: nuid.Next(), Kind: kind, Enabled: enabled, Config: string(js),
 		}
 		return a.DB.Create(&ch).Error
 	}
